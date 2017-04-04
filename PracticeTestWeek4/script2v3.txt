@@ -1,0 +1,7 @@
+1:Sorin:10
+2:Andreea:15
+3:Teo:25
+4:Tuddi:35
+5:Jugar:6
+6:Andreea:5
+7:Teo:30
