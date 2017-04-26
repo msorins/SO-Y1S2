@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
         if( pid == 0) {
             //Code for sun
-            printf("child: %d \n", getpid());
+            printf("child1: %d \n", getpid());
 
             //Redirect output to p1[1]
             dup2(p1[WRITE_END], STDOUT_FILENO);
@@ -36,11 +36,12 @@ int main(int argc, char *argv[]) {
             //Exec the given command (throw output to stdout?)
             execlp("ls", "ls", NULL);
         } else {
-            //Create a new son for the seccond command
+            // Parent create a new son for the second command
             int pid2 = fork();
 
             if(pid2 == 0) {
                 //Code for 2nd sun
+                printf("child2: %d \n", getpid());
 
                 //Redirect input from p1[0]
                 dup2(p1[READ_END], STDIN_FILENO);
