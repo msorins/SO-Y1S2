@@ -1,3 +1,1 @@
-ToolSet: 2.8.0@C:\cygwin64
-Options: 
-CMake: 3.7.1@C:\Program Files (x86)\JetBrains\CLion 2017.1\bin\cmake_cygwin\bin\cmake.exe
+CMake: 3.6.3@/Applications/CLion.app/Contents/bin/cmake/bin/cmake
