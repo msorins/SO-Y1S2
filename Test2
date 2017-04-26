@@ -1,0 +1,39 @@
+D=0
+while [	$# -ne 0 ]
+do
+  if [ -d $1 ]
+  then
+     dim=`du $1	| awk '{print $1}'`
+     echo "Director: "$1 ", marime: " $dim
+  fi
+
+  if [ -f $1 ]
+  then
+    type=`file $1 | grep -c "text"`
+
+    if [ $type == "1" ];
+    then
+      dim2=`ls $1  -l | grep "$1" | cut -d" " -f 5`
+      echo "Fisier text: "$1", marime: " $dim2
+      D=`expr $D - $dim2`
+      shift
+      continue
+    fi
+
+    type=`file $1 | grep -c "executable"`
+    if [ $type == "1" ];
+    then
+      dim2=`ls $1 -l | grep "$1" | cut -d" " -f 5`
+      echo "Fisier executabil: "$1", marime: " $dim2
+      D=`expr $D + $dim2`
+      shift
+      continue
+     fi
+  fi
+
+
+  #Take	the next parameter
+  shift
+done
+
+echo "D	este: "$D
