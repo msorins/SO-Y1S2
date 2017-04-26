@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
 
             //Exec the given command (throw output to stdout?)
             execlp("ls", "ls", NULL);
-            printf("done1\n");
         } else {
             // Parent create a new son for the second command
             int pid2 = fork();
@@ -52,10 +51,11 @@ int main(int argc, char *argv[]) {
                 //Redirect output to p2[1]
                 dup2(p2[WRITE_END], STDOUT_FILENO);
                 close(p2[WRITE_END]);
-                
+
                 //Exec the given command (input taken from stdin, aka pipe)
-                int code = execlp("grep", "grep", "a", NULL);
-                printf("done2\n");
+                
+
+                int code = execlp("grep", "grep", "*", NULL);
                 printf("CODE: %d \n", code);
             }
         }
@@ -64,9 +64,7 @@ int main(int argc, char *argv[]) {
     //Parent waits for sons to finish
     for(i = 1; i < argc; i += 2) {
         wait(0);
-        wait(0);
-       
-        printf("GETS HERE\n");
+
         //Here get the output from pipe
         int nbytes = read(p2[READ_END], res, sizeof(res));
         printf("%s\n", res);
