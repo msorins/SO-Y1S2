@@ -6,6 +6,34 @@
 #define READ_END 0
 #define WRITE_END 1
 
+void waitAndCheckReturnCode(int pid) {
+    /*
+     * Function waits for the process with given PID to end and
+     */
+    int status;
+
+    if ( waitpid(pid, &status, 0) != -1 ) {
+        if ( WIFEXITED(status) ) {
+            int returned = WEXITSTATUS(status);
+            printf("Exited normally with status %d\n", returned);
+        }
+        else if ( WIFSIGNALED(status) ) {
+            int signum = WTERMSIG(status);
+            printf("Exited due to receiving signal %d\n", signum);
+        }
+        else if ( WIFSTOPPED(status) ) {
+            int signum = WSTOPSIG(status);
+            printf("Stopped due to receiving signal %d\n", signum);
+        }
+        else {
+            printf("Something strange just happened.\n");
+        }
+    }
+    else {
+        perror("waitpid() failed");
+        exit(EXIT_FAILURE);
+    }
+}
 
 int main(int argc, char *argv[]) {
     int actualArgc = argc -1;
@@ -26,53 +54,72 @@ int main(int argc, char *argv[]) {
         //Parent creates new son
         int pid = fork();
 
+        if( pid == -1 ) {
+            perror("Error when creating new process");
+        }
+
         if( pid == 0) {
             //Code for sun
-            printf("child1: %d \n", getpid());
 
             //Redirect output to p1[1]
             dup2(p1[WRITE_END], STDOUT_FILENO);
             close(p1[WRITE_END]);
+            close(p1[READ_END]);
+
+            close(p2[WRITE_END]);
+            close(p2[READ_END]);
 
             //Exec the given command (throw output to stdout?)
             execlp("ls", "ls", NULL);
-            printf("done1\n");
-        } else {
+
+        } else if( pid > 0 ){
             // Parent create a new son for the second command
+            int status;
+            printf("PID: %d \n", pid);
+
+            waitAndCheckReturnCode(pid);
+
+
             int pid2 = fork();
+
+            if( pid2 == -1 ) {
+                perror("Error when creating new process");
+            }
 
             if(pid2 == 0) {
                 //Code for 2nd sun
-                printf("child2: %d \n", getpid());
 
                 //Redirect input from p1[0]
                 dup2(p1[READ_END], STDIN_FILENO);
                 close(p1[READ_END]);
+                close(p1[WRITE_END]);
 
                 //Redirect output to p2[1]
                 dup2(p2[WRITE_END], STDOUT_FILENO);
                 close(p2[WRITE_END]);
-                
+                close(p2[READ_END]);
+
                 //Exec the given command (input taken from stdin, aka pipe)
-                int code = execlp("grep", "grep", "a", NULL);
-                printf("done2\n");
-                printf("CODE: %d \n", code);
+
+                //execlp("ls", "ls", "-l", NULL);
+
+                //execlp("sort", "sort", NULL);
+                execlp("head", "head", "-n", "3", NULL);
+                exit(3);
+            } else {
+                //Second parent
+                waitAndCheckReturnCode(pid2);
+
+                //Print the result
+                printf("Ready to print result\n");
+                int nbytes = read(p2[READ_END], res, sizeof(res));
+                printf("\nPair: %d  \n %s \n---\n", (i+1)/2, res);
+                //printf("%d\n", nbytes);
+
             }
+
         }
     }
-
-    //Parent waits for sons to finish
-    for(i = 1; i < argc; i += 2) {
-        wait(0);
-        wait(0);
-       
-        printf("GETS HERE\n");
-        //Here get the output from pipe
-        int nbytes = read(p2[READ_END], res, sizeof(res));
-        printf("%s\n", res);
-        printf("%d\n", nbytes);
-    }
-
 
     getchar();
     return 0;
