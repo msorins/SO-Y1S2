@@ -15,18 +15,24 @@ void waitAndCheckReturnCode(int pid) {
     if ( waitpid(pid, &status, 0) != -1 ) {
         if ( WIFEXITED(status) ) {
             int returned = WEXITSTATUS(status);
-            printf("Exited normally with status %d\n", returned);
+            if(status != 0 ) {
+                perror("Something wrong with your command");
+                exit(8);
+            }
         }
         else if ( WIFSIGNALED(status) ) {
             int signum = WTERMSIG(status);
-            printf("Exited due to receiving signal %d\n", signum);
+            perror("Something wrong happned");
+            exit(9);
         }
         else if ( WIFSTOPPED(status) ) {
             int signum = WSTOPSIG(status);
-            printf("Stopped due to receiving signal %d\n", signum);
+            perror("Something wrong happned");
+            exit(10);
         }
         else {
-            printf("Something strange just happened.\n");
+            perror("Something really wrong happned");
+            exit(11);
         }
     }
     else {
@@ -37,25 +43,22 @@ void waitAndCheckReturnCode(int pid) {
 
 int main(int argc, char *argv[]) {
     int actualArgc = argc -1;
-    int p1[2], p2[2];
     char res[40960];
 
-
-
+    //Check the argments
     if(!actualArgc || actualArgc % 2 != 0) {
         perror("Invalid number of arguments");
-        return 0;
+        exit(1);
     }
 
     int i;
     for(i = 1; i < argc; i += 2) {
 
-        //Create two pipes for current iteration through arguments
+        //Initialise the pipes
         int p1[2], p2[2];
-
         if(pipe(p1) < 0 || pipe(p2) < 0 ) {
             perror("Error creating pipe");
-            exit(1);
+            exit(2);
         }
 
         //Parent creates new son
@@ -63,78 +66,82 @@ int main(int argc, char *argv[]) {
 
         if( pid == -1 ) {
             perror("Error when creating new process");
+            exit(3);
         }
 
-        // =============== 1ST CHILD ====================
+        // ================= 1ST SON =================
         if( pid == 0) {
-            //Code for 1st SUN
-            printf("PID1: %d \n", getpid());
+            //Code for sun
 
             //Redirect output to p1[1]
             dup2(p1[WRITE_END], STDOUT_FILENO);
 
+            //Close pipes
             close(p1[READ_END]);
             close(p2[WRITE_END]);
             close(p2[READ_END]);
 
             //Exec the given command (throw output to stdout)
-            execlp("ls", "ls", NULL);
+            execlp(argv[i], argv[i], NULL);
 
+            //Should not get here
+            exit(12);
         }
-        // =============== END 1ST CHILD ====================
+        // ================= END 1ST SON =================
 
-        // Close pipes
+        //Close pipes before waiting 1st son to exit
         close(p1[READ_END]);
-        close(p2[READ_END]);
         close(p1[WRITE_END]);
+        close(p2[READ_END]);
         close(p2[WRITE_END]);
 
+        //Wait for st son to exit
         waitAndCheckReturnCode(pid);
 
-        // Parent create a new son for the second command
+        //Create the 2nd son
         int pid2 = fork();
         if( pid2 == -1 ) {
             perror("Error when creating new process");
+            exit(4);
         }
 
-        // =============== 2ND CHILD ====================
+
+        // ================= 2ND SON =================
         if(pid2 == 0) {
             //Code for 2nd sun
-            printf("PID2: %d \n", getpid());
 
-            //Redirect input from p1[READ_END]
+            //Redirect input from p1[0]
             dup2(p1[READ_END], STDIN_FILENO);
             close(p1[WRITE_END]);
 
-            //Redirect output to p2[WRITE_END]
+            //Redirect output to p2[1]
             dup2(p2[WRITE_END], STDOUT_FILENO);
             close(p2[READ_END]);
 
             //Exec the given command (input taken from stdin, aka pipe)
-            execlp("sort", "sort", NULL);
-            //execlp("head", "head", "-n", "3", NULL);
-            exit(3);
-        }
-        // =============== 2ND CHILD ====================
+            execlp(argv[i+1], argv[i+1], NULL);
 
-        // Close pipes
+            //Should not get here
+            exit(13);
+        }
+        // ================= END 2ND SON =================
+
+        //Close pipes before waiting 2nd son to exit
         close(p1[READ_END]);
         close(p1[WRITE_END]);
         close(p2[WRITE_END]);
 
-        //Wait for 2nd child to finish
+        //Wait for 2nd son to exit
         waitAndCheckReturnCode(pid2);
 
         //Print the result
-        printf("Ready to print result\n");
         int nbytes = read(p2[READ_END], res, sizeof(res));
-        printf("\nPair: %d  \n %s \n---\n", (i+1)/2, res);
+        printf("\nResult from pair: %d  \n %s \n---\n", (i+1)/2, res);
 
-        //Close remaining pipes
+        //Close all pipes
         close(p2[READ_END]);
 
-        //Ready for next iteraton
-
+        //Ready for next iteration
     }
 
     getchar();
