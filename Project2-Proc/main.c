@@ -89,13 +89,7 @@ int main(int argc, char *argv[]) {
         }
         // ================= END 1ST SON =================
 
-        
-	//Close pipes before waiting 1st son to exit
-        //close(p1[READ_END]);
-        //close(p1[WRITE_END]);
-        
-
-        //Wait for st son to exit
+        //Wait for 1st son to exit
         waitAndCheckReturnCode(pid);
 
         //Create the 2nd son
