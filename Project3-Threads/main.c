@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <ctype.h>
 
-#define MAXSIR 100
+#define MAXSIR 1005
 
 
 pthread_mutex_t countAppearencesMutex;
@@ -24,7 +24,7 @@ void* computeFileThread(void *arg) {
 
     //Open the file
     FILE *file = fopen(obj->file, "r");
-    char crtChar, lastChar=NULL;
+    char crtChar, crtCuv[MAXSIR];
     int nrCuv = 0;
 
     //Check to see if file really opened
@@ -35,10 +35,19 @@ void* computeFileThread(void *arg) {
 
     //Count the words
     while((crtChar = getc(file)) != EOF) {
-        if((crtChar == ' ' || crtChar =='\n') && (isalpha(lastChar) || lastChar == NULL ))
-            nrCuv ++;
+        //If current character is a space or new line. Check to see if the word formed is a match & resete the current word
+        if(crtChar == ' ' || crtChar =='\n') {
+            if(strcmp(crtCuv, obj->word) == 0)
+                nrCuv++;
+            strcpy(crtCuv, "");
+            continue;
+        }
 
-        lastChar = crtChar;
+        //If current character is a letter add it to the word
+        if(isalpha(crtChar)) {
+            crtCuv[strlen(crtCuv)] = crtChar;
+            continue;
+        }
     }
 
     printf("nrcuv: %d\n", nrCuv);
