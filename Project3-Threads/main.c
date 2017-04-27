@@ -20,12 +20,11 @@ typedef struct dataTransferThread{
 //Thread computing function
 void* computeFileThread(void *arg) {
     struct dataTransferThread *obj = (struct dataTransferThread*)arg;
-    printf("Thread. File: %s\n Words: %s\n", obj->file, obj->word);
 
     //Open the file
     FILE *file = fopen(obj->file, "r");
-    char crtChar, crtCuv[MAXSIR];
-    int nrCuv = 0;
+    char crtChar, crtCuv[MAXSIR], crtLength = 0;
+    int nrAppearances = 0;
 
     //Check to see if file really opened
     if(!file) {
@@ -37,31 +36,37 @@ void* computeFileThread(void *arg) {
     while((crtChar = getc(file)) != EOF) {
         //If current character is a space or new line. Check to see if the word formed is a match & resete the current word
         if(crtChar == ' ' || crtChar =='\n') {
+            crtCuv[crtLength] = '\0';
+
             if(strcmp(crtCuv, obj->word) == 0)
-                nrCuv++;
-            strcpy(crtCuv, "");
+                nrAppearances++;
+
+            crtLength=0;
             continue;
         }
 
         //If current character is a letter add it to the word
-        if(isalpha(crtChar)) {
-            crtCuv[strlen(crtCuv)] = crtChar;
+        if(isalpha(crtChar) || (crtChar == '-')) {
+            crtCuv[crtLength++] = crtChar;
             continue;
         }
     }
 
-    printf("nrcuv: %d\n", nrCuv);
+    //One more check at the final
+    if(strcmp(crtCuv, obj->word) == 0)
+        nrAppearances++;
+
+    //Print current result
+    printf("Words: %s  ->   Appearences: %d\n", obj->word, nrAppearances);
 
     //Add current result to a global one (synchronised operation)
     pthread_mutex_lock(&countAppearencesMutex);
-    appearences += nrCuv;
+    appearences += nrAppearances;
     pthread_mutex_unlock(&countAppearencesMutex);
 
 
     return 0;
 }
-
-
 
 int main(int argc, char *argv[]) {
     //Initialisaton
