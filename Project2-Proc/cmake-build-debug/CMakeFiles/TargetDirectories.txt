@@ -1,3 +1,0 @@
-/cygdrive/c/Users/z003swax/Desktop/UBB/SO-Y1S2/Project2-Proc/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/cygdrive/c/Users/z003swax/Desktop/UBB/SO-Y1S2/Project2-Proc/cmake-build-debug/CMakeFiles/edit_cache.dir
-/cygdrive/c/Users/z003swax/Desktop/UBB/SO-Y1S2/Project2-Proc/cmake-build-debug/CMakeFiles/Project_.dir

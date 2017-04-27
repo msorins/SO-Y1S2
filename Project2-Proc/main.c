@@ -89,11 +89,11 @@ int main(int argc, char *argv[]) {
         }
         // ================= END 1ST SON =================
 
-        //Close pipes before waiting 1st son to exit
-        close(p1[READ_END]);
-        close(p1[WRITE_END]);
-        close(p2[READ_END]);
-        close(p2[WRITE_END]);
+        
+	//Close pipes before waiting 1st son to exit
+        //close(p1[READ_END]);
+        //close(p1[WRITE_END]);
+        
 
         //Wait for st son to exit
         waitAndCheckReturnCode(pid);
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 
         //Print the result
         int nbytes = read(p2[READ_END], res, sizeof(res));
-        printf("\nResult from pair: %d  \n %s \n---\n", (i+1)/2, res);
+        printf("\nResult from pair: %d \n%s \n---\n", (i+1)/2, res);
 
         //Close all pipes
         close(p2[READ_END]);
