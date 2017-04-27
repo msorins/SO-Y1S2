@@ -1,4 +1,4 @@
-# Install script for directory: /cygdrive/c/Users/z003swax/Desktop/UBB/SO/Project@
+# Install script for directory: /cygdrive/c/Users/z003swax/Desktop/UBB/SO-Y1S2/Project2-Proc
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/cygdrive/c/Users/z003swax/Desktop/UBB/SO/Project@/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/cygdrive/c/Users/z003swax/Desktop/UBB/SO-Y1S2/Project2-Proc/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
