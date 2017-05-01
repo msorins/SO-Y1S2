@@ -1,0 +1,3 @@
+/Users/so/Desktop/UBB/SO/PracticeProc/PracticeProcTest3/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/so/Desktop/UBB/SO/PracticeProc/PracticeProcTest3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/so/Desktop/UBB/SO/PracticeProc/PracticeProcTest3/cmake-build-debug/CMakeFiles/PracticeProcTest3.dir

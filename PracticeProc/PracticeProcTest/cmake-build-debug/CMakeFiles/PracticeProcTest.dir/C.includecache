@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/so/Desktop/UBB/SO/PracticeProcTest/main.c
+stdio.h
+-
+unistd.h
+-
+sys/wait.h
+-
+stdlib.h
+-
+
+/Users/so/Desktop/UBB/SO/PracticeProcTest/main2.c
+stdio.h
+-
+unistd.h
+-
+sys/wait.h
+-
+stdlib.h
+-
+

@@ -1,0 +1,7 @@
+Pentru fiecare director specificat in linia de comanda
+sa se determine:
+1. Cate fisiere contine, el si subdirectoarele lui.
+2. Care este fisierul care ocupa cel mai mult spatiu pe disc.
+3. Primele 3 linii din fisierul care ocupa cel mai putin spatiu pe disc.
+4. Care sunt depturile de acces, pentru cei din grupa, pe care le are directorul.
+Timp de lucru 50 de minute.
