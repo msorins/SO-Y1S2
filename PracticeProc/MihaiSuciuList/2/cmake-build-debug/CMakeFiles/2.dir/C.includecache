@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/so/Desktop/UBB/SO/PracticeProc/MihaiSuciuList/2/main.c
+stdio.h
+-
+unistd.h
+-
+stdlib.h
+-
+string.h
+-
+

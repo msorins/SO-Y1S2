@@ -1,0 +1,3 @@
+/Users/so/Desktop/UBB/SO/PracticeProc/MihaiSuciuList/2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/so/Desktop/UBB/SO/PracticeProc/MihaiSuciuList/2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/so/Desktop/UBB/SO/PracticeProc/MihaiSuciuList/2/cmake-build-debug/CMakeFiles/2.dir
