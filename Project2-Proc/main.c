@@ -2,9 +2,38 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define READ_END 0
 #define WRITE_END 1
+
+void splitArgv(char *arg, char *cmd, char*  argMat[]) {
+    int crtLine = 0, i = 0, crtLength = 0;
+    argMat[crtLine] = malloc(sizeof(char) * 100);
+
+    for(i = 0; i < strlen(arg); i++) {
+        if(isalpha(arg[i]) || arg[i] == '-' || arg[i] == '/' || isdigit(arg[i])) {
+            argMat[crtLine][crtLength] = arg[i];
+            if(!crtLine)
+                cmd[crtLength] = arg[i];
+
+            crtLength++;
+        }
+        else if (arg[i] == ' ') {
+            argMat[crtLine][++crtLength]='\0';
+            if(!crtLine)
+                cmd[crtLength]='\0';
+
+            crtLine++;
+            argMat[crtLine] = malloc(sizeof(char) * 100);
+            crtLength=0;
+        }
+
+    }
+
+    argMat[++crtLine] = NULL;
+}
 
 void waitAndCheckReturnCode(int pid) {
     /*
@@ -16,6 +45,7 @@ void waitAndCheckReturnCode(int pid) {
         if ( WIFEXITED(status) ) {
             int returned = WEXITSTATUS(status);
             if(status != 0 ) {
+                printf("%d", returned);
                 perror("Something wrong with your command");
                 exit(8);
             }
@@ -45,6 +75,7 @@ int main(int argc, char *argv[]) {
     int actualArgc = argc -1;
     char res[40960];
 
+
     //Check the argments
     if(!actualArgc || actualArgc % 2 != 0) {
         perror("Invalid number of arguments");
@@ -53,7 +84,6 @@ int main(int argc, char *argv[]) {
 
     int i;
     for(i = 1; i < argc; i += 2) {
-
         //Initialise the pipes
         int p1[2], p2[2];
         if(pipe(p1) < 0 || pipe(p2) < 0 ) {
@@ -81,16 +111,23 @@ int main(int argc, char *argv[]) {
             close(p2[WRITE_END]);
             close(p2[READ_END]);
 
+            //Split the arguments
+            char *cmd = malloc(sizeof(char) * 100);
+            char *argMat[1000];
+            splitArgv(argv[i], cmd, argMat);
+
             //Exec the given command (throw output to stdout)
-            execlp(argv[i], argv[i], NULL);
+            execv(cmd, argMat);
 
             //Should not get here
-            exit(12);
+            exit(13);
         }
         // ================= END 1ST SON =================
 
+
         //Wait for 1st son to exit
         waitAndCheckReturnCode(pid);
+
 
         //Create the 2nd son
         int pid2 = fork();
@@ -112,11 +149,17 @@ int main(int argc, char *argv[]) {
             dup2(p2[WRITE_END], STDOUT_FILENO);
             close(p2[READ_END]);
 
+            //Split the arguments
+            char *cmd = malloc(sizeof(char) * 100);
+            char **argMat = malloc(sizeof(char*) * 100);
+
+            splitArgv(argv[i + 1], cmd, argMat);
+
             //Exec the given command (input taken from stdin, aka pipe)
-            execlp(argv[i+1], argv[i+1], NULL);
+            execv(cmd, argMat);
 
             //Should not get here
-            exit(13);
+            exit(14);
         }
         // ================= END 2ND SON =================
 
@@ -136,6 +179,7 @@ int main(int argc, char *argv[]) {
         close(p2[READ_END]);
 
         //Ready for next iteration
+
     }
 
     getchar();
